@@ -25,28 +25,30 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import QtQuick 1.1
+import QtQuick 2.0
+import Sailfish.Silica 1.0
 
-QtObject {
-    id: constant
+Item {
+    id: customCountBubble
 
-    property color colorHighlighted: colorLight
-    property color colorLight: theme.inverted ? "#ffffff" : "#191919"
-    property color colorMid: theme.inverted ? "#8c8c8c" : "#666666"
-    property color colorTextSelection: "#4591ff"
-    property color colorDisabled: theme.inverted ? "#444444" : "#b2b2b4"
+    property int value
+    property string text
 
-    property int paddingSmall: 4
-    property int paddingMedium: 8
-    property int paddingLarge: 12
-    property int paddingXLarge: 16
+    height: valueText.paintedHeight + 2 * Theme.paddingSmall
+    width: valueText.paintedWidth + 2 * Theme.paddingMedium
 
-    property int fontSizeXSmall: 20
-    property int fontSizeSmall: 22
-    property int fontSizeMedium: 24
-    property int fontSizeLarge: 26
-    property int fontSizeXLarge: 28
-    property int fontSizeXXLarge: 32
+    Rectangle {
+        id: background
+        anchors.fill: parent
+        radius: Theme.paddingLarge
+        color: "#000"
+    }
 
-    property int headerHeight: inPortrait ? 72 : 56
+    Text {
+        id: valueText
+        anchors.centerIn: parent
+        font.pixelSize: Theme.fontSizeSmall
+        color: Theme.secondaryColor
+        text: customCountBubble.value + " " + customCountBubble.text
+    }
 }

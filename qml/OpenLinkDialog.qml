@@ -25,61 +25,40 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import QtQuick 1.1
-import com.nokia.symbian 1.1
+import QtQuick 2.0
+import Sailfish.Silica 1.0
 
-Item {
-    id: root
+ContextMenu {
+    id: openLinkDialog
 
-    property string text: ""
-    property variant buttonsText: []
-    property int checkedButtonIndex: 0
+    property string link
 
-    signal buttonClicked(int index)
-
-    width: parent.width
-    height: settingText.paintedHeight + buttonRow.height + buttonRow.anchors.topMargin
-
-    Text {
-        id: settingText
-        anchors { left: parent.left; top: parent.top; leftMargin: constant.paddingMedium }
-        font.pixelSize: constant.fontSizeLarge
+    platformTitle: Text {
+        anchors { left: parent.left; right: parent.right }
+        horizontalAlignment: Text.AlignHCenter
+        text: link
+        font.italic: true
+        font.pixelSize: constant.fontSizeMedium
         color: constant.colorLight
-        text: root.text
+        elide: Text.ElideRight
+        maximumLineCount: 3
+        wrapMode: Text.WrapAnywhere
     }
 
-    ButtonRow {
-        id: buttonRow
-        anchors {
-            top: settingText.bottom
-            left: parent.left
-            right: parent.right
-            margins: constant.paddingSmall
-        }
-    }
-
-    Component {
-        id: buttonComponent
-
-        Button {
-            id: thisButton
-            platformInverted: appSettings.whiteTheme
+    MenuLayout {
+        MenuItem {
+            text: "Open link in web browser"
             onClicked: {
-                for (var i=0; i<parent.children.length; ++i) {
-                    if (parent.children[i] == thisButton) {
-                        buttonClicked(i);
-                        break;
-                    }
-                }
+                Qt.openUrlExternally(link)
+                infoBanner.alert("Launching web browser...")
             }
         }
-    }
-
-    Component.onCompleted: {
-        for (var i=0; i<buttonsText.length; ++i) {
-            var button = buttonComponent.createObject(buttonRow, { text: buttonsText[i] });
+        MenuItem {
+            text: "Copy link"
+            onClicked: {
+                QMLUtils.copyToClipboard(link)
+                infoBanner.alert("Link copied to clipboard")
+            }
         }
-        if (buttonRow.children.length > 0)
-            buttonRow.checkedButton = buttonRow.children[checkedButtonIndex]
     }
 }

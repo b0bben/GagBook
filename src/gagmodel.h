@@ -29,7 +29,7 @@
 #define GAGMODEL_H
 
 #include <QtCore/QAbstractListModel>
-#include <QtDeclarative/QDeclarativeParserStatus>
+#include <QQmlParserStatus>
 
 #include "gagobject.h"
 
@@ -37,10 +37,10 @@ class GagBookManager;
 class GagRequest;
 class GagImageDownloader;
 
-class GagModel : public QAbstractListModel, public QDeclarativeParserStatus
+class GagModel : public QAbstractListModel, public QQmlParserStatus
 {
     Q_OBJECT
-    Q_INTERFACES(QDeclarativeParserStatus)
+    Q_INTERFACES(QQmlParserStatus)
     Q_ENUMS(RefreshType)
     Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
     Q_PROPERTY(qreal progress READ progress NOTIFY progressChanged)
@@ -73,6 +73,7 @@ public:
 
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
+    QHash<int, QByteArray> roleNames() const;
 
     bool isBusy() const;
     qreal progress() const;
@@ -105,6 +106,7 @@ private:
     qreal m_progress;
     GagBookManager *m_manager;
     int m_selectedSection;
+    QHash<int, QByteArray> _roles;
 
     QList<GagObject> m_gagList;
     GagRequest *m_request;

@@ -25,14 +25,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import QtQuick 1.1
-import com.nokia.meego 1.0
+import QtQuick 2.0
+import Sailfish.Silica 1.0
 import GagBook 1.0
 
 Page {
     id: mainPage
 
-    tools: ToolBarLayout {
+    /*tools: ToolBarLayout {
         ToolIcon {
             platformIconId: "toolbar-back-dimmed"
             enabled: false
@@ -69,7 +69,7 @@ Page {
                 onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
             }
         }
-    }
+    }*/
 
     ListView {
         id: gagListView
@@ -79,7 +79,7 @@ Page {
         delegate: GagDelegate {}
         footer: Item {
             width: ListView.view.width
-            height: ListView.view.count > 0 ? footerColumn.height + 2 * constant.paddingLarge
+            height: ListView.view.count > 0 ? footerColumn.height + 2 * Theme.paddingLarge
                                             : ListView.view.height
             visible: gagModel.busy
 
@@ -87,14 +87,14 @@ Page {
                 id: footerColumn
                 anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter }
                 height: childrenRect.height
-                spacing: constant.paddingMedium
+                spacing: Theme.paddingMedium
 
                 Text {
                     anchors { left: parent.left; right: parent.right }
                     horizontalAlignment: Text.AlignHCenter
                     elide: Text.ElideRight
-                    font.pixelSize: constant.fontSizeMedium
-                    color: constant.colorLight
+                    font.pixelSize: Theme.fontSizeMedium
+                    color: Theme.secondaryColor
                     text: "Downloading..."
                 }
 
@@ -113,9 +113,9 @@ Page {
     PageHeader {
         id: pageHeader
         anchors { top: parent.top; left: parent.left; right: parent.right }
-        text: "/" + appSettings.sections[gagModel.selectedSection]
-        busy: gagModel.busy
-        onClicked: gagListView.positionViewAtBeginning()
+        title: "/" + appSettings.sections[gagModel.selectedSection]
+        /*busy: gagModel.busy
+        onClicked: gagListView.positionViewAtBeginning()*/
     }
 
     GagModel {
@@ -128,7 +128,7 @@ Page {
         id: dialogManager
 
         property Component __listModelComponent: Component { ListModel {} }
-        property Component __selectionDialogComponent: Component { SelectionDialog {} }
+        property Component __selectionDialogComponent: Component { Dialog {} }
         property Component __openLinkDialogComponent: null
 
         function createSectionDialog() {

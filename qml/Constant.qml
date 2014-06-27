@@ -25,31 +25,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import QtQuick 1.1
-import com.nokia.symbian 1.1
-import com.nokia.extras 1.1
-import GagBook 1.0
+import QtQuick 2.0
 
-PageStackWindow {
-    id: appWindow
+QtObject {
+    id: constant
 
-    platformInverted: appSettings.whiteTheme
-    initialPage: MainPage { id: mainPage }
+    property color colorHighlighted: colorLight
+    property color colorLight: theme.inverted ? "#ffffff" : "#191919"
+    property color colorMid: theme.inverted ? "#8c8c8c" : "#666666"
+    property color colorTextSelection: "#4591ff"
+    property color colorDisabled: theme.inverted ? "#444444" : "#b2b2b4"
 
-    Constant { id: constant }
+    property int paddingSmall: 4
+    property int paddingMedium: 8
+    property int paddingLarge: 12
+    property int paddingXLarge: 16
 
-    InfoBanner {
-        id: infoBanner
-        platformInverted: appSettings.whiteTheme
+    property int fontSizeXSmall: 20
+    property int fontSizeSmall: 22
+    property int fontSizeMedium: 24
+    property int fontSizeLarge: 26
+    property int fontSizeXLarge: 28
+    property int fontSizeXXLarge: 32
 
-        function alert(text) {
-            infoBanner.text = text
-            infoBanner.open()
-        }
-    }
-
-    GagBookManager {
-        id: gagbookManager
-        settings: AppSettings { id: appSettings }
-    }
+    property int headerHeight: inPortrait ? 72 : 56
 }

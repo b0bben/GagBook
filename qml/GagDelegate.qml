@@ -25,8 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import QtQuick 1.1
-import com.nokia.symbian 1.1
+import QtQuick 2.0
+import Sailfish.Silica 1.0
 
 Item {
     id: root
@@ -35,44 +35,33 @@ Item {
 
     Column {
         id: mainColumn
-        anchors { left: parent.left; right: parent.right; top: parent.top; topMargin: constant.paddingLarge }
+        anchors { left: parent.left; right: parent.right; top: parent.top; topMargin: Theme.paddingLarge }
         height: childrenRect.height
-        spacing: constant.paddingMedium
+        spacing: Theme.paddingMedium
 
         Text {
-            anchors { left: parent.left; right: parent.right; margins: constant.paddingMedium }
-            font.pixelSize: constant.fontSizeMedium
+            anchors { left: parent.left; right: parent.right; margins: Theme.paddingMedium }
+            font.pixelSize: Theme.fontSizeMedium
             font.bold: true
-            color: constant.colorLight
+            color: Theme.primaryColor
             wrapMode: Text.Wrap
             text: model.title
         }
 
         Row {
-            anchors { left: parent.left; right: parent.right; margins: constant.paddingMedium  }
-            spacing: constant.paddingMedium
+            anchors { left: parent.left; right: parent.right; margins: Theme.paddingMedium  }
+            spacing: Theme.paddingMedium
 
             CustomCountBubble {
                 value: model.votesCount
-            }
-
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: constant.fontSizeMedium
-                color: constant.colorLight
                 text: "points"
             }
 
             CustomCountBubble {
                 value: model.commentsCount
-            }
-
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: constant.fontSizeMedium
-                color: constant.colorLight
                 text: "comments"
             }
+
         }
 
         Image {
@@ -130,13 +119,13 @@ Item {
                                 verticalCenter: parent.verticalCenter
                             }
                             height: childrenRect.height
-                            spacing: constant.paddingMedium
+                            spacing: Theme.paddingMedium
 
                             Text {
                                 anchors { left: parent.left; right: parent.right }
                                 horizontalAlignment: Text.AlignHCenter
-                                font.pixelSize: constant.fontSizeLarge
-                                color: constant.colorLight
+                                font.pixelSize: Theme.fontSizeLarge
+                                color: Theme.primaryColor
                                 font.bold: true
                                 wrapMode: Text.Wrap
                                 text: "Not Safe For Work"
@@ -145,8 +134,8 @@ Item {
                             Text {
                                 anchors { left: parent.left; right: parent.right }
                                 horizontalAlignment: Text.AlignHCenter
-                                font.pixelSize: constant.fontSizeMedium
-                                color: constant.colorLight
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.primaryColor
                                 wrapMode: Text.Wrap
                                 text: "Unfortunately, GagBook does not support viewing NSFW images yet"
                             }
@@ -164,13 +153,13 @@ Item {
                                 verticalCenter: parent.verticalCenter
                             }
                             height: childrenRect.height
-                            spacing: constant.paddingMedium
+                            spacing: Theme.paddingMedium
 
                             Text {
                                 anchors { left: parent.left; right: parent.right }
                                 horizontalAlignment: Text.AlignHCenter
-                                font.pixelSize: constant.fontSizeLarge
-                                color: constant.colorLight
+                                font.pixelSize: Theme.fontSizeLarge
+                                color: Theme.primaryColor
                                 font.bold: true
                                 wrapMode: Text.Wrap
                                 text: "Image not downloaded"
@@ -179,8 +168,8 @@ Item {
                             Text {
                                 anchors { left: parent.left; right: parent.right }
                                 horizontalAlignment: Text.AlignHCenter
-                                font.pixelSize: constant.fontSizeMedium
-                                color: constant.colorLight
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.primaryColor
                                 wrapMode: Text.Wrap
                                 text: "Click to download image"
                             }
@@ -194,9 +183,9 @@ Item {
                     Item {
                         BusyIndicator {
                             anchors.centerIn: parent
-                            height: platformStyle.graphicSizeLarge
-                            width: platformStyle.graphicSizeLarge
                             running: true
+                            visible: running
+                            size: BusyIndicatorSize.Large
                         }
                     }
                 }
@@ -207,8 +196,8 @@ Item {
                     Text {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pixelSize: constant.fontSizeLarge
-                        color: constant.colorLight
+                        font.pixelSize: Theme.fontSizeLarge
+                        color: Theme.primaryColor
                         wrapMode: Text.Wrap
                         text: "Error loading image"
                     }
@@ -217,7 +206,7 @@ Item {
                 Component {
                     id: loadingRect
 
-                    Rectangle { color: constant.colorMid }
+                    Rectangle { color: "#000" }
                 }
 
                 Component {
@@ -248,7 +237,7 @@ Item {
                 onClicked: {
                     if (model.isNSFW) return;
                     if (model.isVideo) {
-                        QMLUtils.openDefaultBrowser(model.url);
+                        Qt.openUrlExternally(model.url);
                         return;
                     }
                     if (!gagImage.source.toString()) {
@@ -262,34 +251,30 @@ Item {
             }
         }
 
-        ButtonRow{
+        /*ButtonRow{
             anchors { left: parent.left; right: parent.right; margins: constant.paddingMedium }
             height: childrenRect.height
             exclusive: false
 
             Button {
-                platformInverted: appSettings.whiteTheme
-                iconSource: "Images/instant_messenger_chat" + (platformInverted ? "_inverted.svg" : ".svg")
+                iconSource: "image://theme/icon-m-toolbar-new-message" + (appSettings.whiteTheme ? "" : "-selected")
                 onClicked: pageStack.push(Qt.resolvedUrl("CommentsPage.qml"), { gagURL: model.url })
             }
             Button {
-                platformInverted: appSettings.whiteTheme
-                iconSource: "Images/internet" + (platformInverted ? "_inverted.svg" : ".svg")
+                iconSource: "image://theme/icon-l-browser-main-view"
                 onClicked: dialogManager.createOpenLinkDialog(model.url)
             }
             Button {
-                platformInverted: appSettings.whiteTheme
-                iconSource: "image://theme/toolbar-share" + (platformInverted ? "_inverse" : "")
-                onClicked: dialogManager.createShareDialog(model.url)
+                iconSource: "image://theme/icon-m-toolbar-share" + (appSettings.whiteTheme ? "" : "-selected")
+                onClicked: QMLUtils.shareLink(model.url, model.title);
             }
             Button {
                 property string __savedFilePath: ""
-                platformInverted: appSettings.whiteTheme
                 iconSource: {
                     if (!__savedFilePath)
-                        return "Images/download" + (platformInverted ? "_inverted.svg" : ".svg");
+                        return "image://theme/icon-s-transfer-download" + (appSettings.whiteTheme ? "" : "-inverse")
                     else
-                        return "Images/photos" + (platformInverted ? "_inverted.svg" : ".svg");
+                        return "image://theme/icon-m-toolbar-gallery" + (appSettings.whiteTheme ? "" : "-selected")
                 }
                 onClicked: {
                     if (!__savedFilePath) {
@@ -312,13 +297,13 @@ Item {
                     }
                 }
             }
-        }
+        }*/
     }
 
     Rectangle {
         id: seperator
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
         height: 1
-        color: constant.colorMid
+        color: "white"
     }
 }

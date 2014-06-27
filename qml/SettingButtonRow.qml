@@ -25,48 +25,51 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import QtQuick 1.1
-import com.nokia.symbian 1.1
+import QtQuick 2.0
+import Sailfish.Silica 1.0
 
-ContextMenu {
-    id: shareDialog
+Item {
+    id: root
 
-    property string link
+    property string text: ""
+    property variant buttonsText: []
+    property int checkedButtonIndex: 0
 
-    platformInverted: appSettings.whiteTheme
+    signal buttonClicked(int index)
 
-    MenuLayout {
-        MenuItem {
-            text: "Share via Facebook"
-            platformInverted: shareDialog.platformInverted
-            onClicked: {
-                QMLUtils.openDefaultBrowser("http://www.facebook.com/sharer.php?u=" + link)
-                infoBanner.alert("Launching web browser...")
+    width: parent.width
+    height: settingText.paintedHeight + buttonRow.height + buttonRow.anchors.topMargin
+
+    Text {
+        id: settingText
+        anchors { left: parent.left; top: parent.top; leftMargin: constant.paddingMedium }
+        font.pixelSize: constant.fontSizeLarge
+        color: constant.colorLight
+        text: root.text
+    }
+
+    ButtonRow {
+        id: buttonRow
+        anchors {
+            top: settingText.bottom
+            left: parent.left
+            right: parent.right
+            margins: constant.paddingSmall
+        }
+
+        Repeater {
+            id: buttonRepeater
+            model: root.buttonsText
+
+            Button {
+                text: modelData
+                onClicked: root.buttonClicked(index)
             }
         }
-        MenuItem {
-            text: "Share via Twitter"
-            platformInverted: shareDialog.platformInverted
-            onClicked: {
-                QMLUtils.openDefaultBrowser("https://twitter.com/intent/tweet?url=" + link);
-                infoBanner.alert("Launching web browser...");
-            }
-        }
-        MenuItem {
-            text: "Share via SMS"
-            platformInverted: shareDialog.platformInverted
-            onClicked: {
-                Qt.openUrlExternally("sms:?body=" + link)
-                infoBanner.alert("Launching SMS...")
-            }
-        }
-        MenuItem {
-            text: "Share via email"
-            platformInverted: shareDialog.platformInverted
-            onClicked: {
-                Qt.openUrlExternally("mailto:?body=" + link)
-                infoBanner.alert("Launching email client...")
-            }
-        }
+    }
+
+    Component.onCompleted: {
+        if (buttonRepeater.count > 0)
+            buttonRow.checkedButton = buttonRepeater.itemAt(root.checkedButtonIndex)
     }
 }

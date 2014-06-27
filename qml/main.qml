@@ -25,50 +25,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import QtQuick 1.1
-import com.nokia.meego 1.0
-import QtWebKit 1.0
+import QtQuick 2.0
+import Sailfish.Silica 1.0
+import GagBook 1.0
 
-Page {
-    id: commentsPage
+ApplicationWindow {
+    id: appWindow
 
-    property string gagURL
+    //showStatusBar: inPortrait
+    initialPage: MainPage { id: mainPage }
 
-    tools: ToolBarLayout {
-        ToolIcon {
-            platformIconId: "toolbar-back"
-            onClicked: pageStack.pop()
+    /*InfoBanner {
+        id: infoBanner
+        topMargin: showStatusBar ? 40 : 8
+
+        function alert(text) {
+            infoBanner.text = text
+            infoBanner.show()
         }
-    }
+    }*/
 
-    Flickable {
-        id: webViewFlickable
-        anchors { top: pageHeader.bottom; bottom: parent.bottom; left: parent.left; right: parent.right }
-        contentHeight: commentsWebView.height
-
-        WebView {
-            id: commentsWebView
-            preferredHeight: webViewFlickable.height
-            preferredWidth: webViewFlickable.width
-
-            onLoadStarted: pageHeader.busy = true
-            onLoadFailed: pageHeader.busy = false
-            onLoadFinished: pageHeader.busy = false
-        }
-    }
-
-    ScrollDecorator { flickableItem: webViewFlickable }
-
-    PageHeader {
-        id: pageHeader
-        anchors { top: parent.top; left: parent.left; right: parent.right }
-        text: "Comments"
-        onClicked: webViewFlickable.contentY = 0;
-    }
-
-    Component.onCompleted: {
-        var url = "http://comment.9gag.com/comment/list?url=%1" +
-                "&appId=a_dd8f2b7d304a10edaf6f29517ea0ca4100a43d1b&readOnly=1"
-        commentsWebView.url = url.arg(gagURL);
+    GagBookManager {
+        id: gagbookManager
+        settings: AppSettings { id: appSettings }
     }
 }

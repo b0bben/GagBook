@@ -25,16 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <QtGui/QApplication>
-#include <QtDeclarative/QDeclarativeContext>
-#include <QtDeclarative/QDeclarativeEngine>
-#include <QtDeclarative/qdeclarative.h>
-#include "qmlapplicationviewer.h"
+#include <QGuiApplication>
+#include <QQuickView>
+#include <QQmlContext>
 
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
-#include <QtGui/QSplashScreen>
-#include <QtGui/QPixmap>
-#endif
+#include "sailfishapp.h"
 
 #include "src/gagbookmanager.h"
 #include "src/gagmodel.h"
@@ -44,40 +39,39 @@
 
 Q_DECL_EXPORT int main(int argc, char *argv[])
 {
-    QScopedPointer<QApplication> app(createApplication(argc, argv));
+    // SailfishApp::main() will display "qml/template.qml", if you need more
+    // control over initialization, you can use:
+    //
+    //   - SailfishApp::application(int, char *[]) to get the QGuiApplication *
+    //   - SailfishApp::createView() to get a new QQuickView * instance
+    //   - SailfishApp::pathTo(QString) to get a QUrl to a resource file
+    //
+    // To display the view, call "show()" (will show fullscreen on device).
+
+    //return SailfishApp::main(argc, argv);
+
+    QScopedPointer<QGuiApplication> app (SailfishApp::application(argc, argv));
 
     app->setApplicationName("GagBook");
     app->setOrganizationName("GagBook");
     app->setApplicationVersion(APP_VERSION);
 
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
-    QSplashScreen *splash = new QSplashScreen(QPixmap(":/gagbook-splash-symbian.jpg"));
-    splash->show();
-    splash->showMessage("Loading...", Qt::AlignHCenter | Qt::AlignBottom, Qt::white);
-#endif
+    QScopedPointer<QQuickView> view(SailfishApp::createView());
 
-    QmlApplicationViewer viewer;
-    viewer.rootContext()->setContextProperty("APP_VERSION", APP_VERSION);
-    viewer.rootContext()->setContextProperty("QMLUtils", QMLUtils::instance());
+    view->rootContext()->setContextProperty("APP_VERSION", APP_VERSION);
+    view->rootContext()->setContextProperty("QMLUtils", QMLUtils::instance());
 
     qmlRegisterType<GagBookManager>("GagBook", 1, 0, "GagBookManager");
     qmlRegisterType<GagModel>("GagBook", 1, 0, "GagModel");
     qmlRegisterType<AppSettings>("GagBook", 1, 0, "AppSettings");
 
-    viewer.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-#if defined(Q_OS_HARMATTAN)
-    viewer.setMainQmlFile(QLatin1String("qml/gagbook-harmattan/main.qml"));
-#elif defined(Q_OS_SYMBIAN)
-    viewer.setMainQmlFile(QLatin1String("qml/gagbook-symbian/main.qml"));
-#else // Simulator. Change this value to run Symbian or Harmattan version on simulator
-    viewer.setMainQmlFile(QLatin1String("qml/gagbook-harmattan/main.qml"));
-#endif
-    viewer.showExpanded();
+    //view.setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
 
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
-    splash->finish(&viewer);
-    splash->deleteLater();
-#endif
+    view->setSource(SailfishApp::pathTo("qml/main.qml"));
+
+    //show the view
+    view->show();
+
 
     return app->exec();
 }
