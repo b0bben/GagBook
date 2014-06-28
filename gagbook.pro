@@ -5,7 +5,7 @@ TARGET = gagbook
 VERSION = 0.9.0
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
-QT += network xml xmlpatterns
+QT += network widgets webkitwidgets
 
 # Qt-Json
 HEADERS += qt-json/json.h \

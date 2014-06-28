@@ -166,6 +166,8 @@ void GagModel::refresh(RefreshType refreshType)
         qWarning("GagModel::refresh(): Invalid source, default source will be used");
         // fallthrough
     case AppSettings::NineGagSource:
+        m_request = new NineGagRequest(manager()->networkManager(), section, this);
+        break;
     case AppSettings::InfiniGagSource:
         m_request = new InfiniGagRequest(manager()->networkManager(), section, this);
         break;

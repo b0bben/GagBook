@@ -25,7 +25,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <QGuiApplication>
+#include <QApplication>
 #include <QQuickView>
 #include <QQmlContext>
 
@@ -50,11 +50,11 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
 
     //return SailfishApp::main(argc, argv);
 
-    QScopedPointer<QGuiApplication> app (SailfishApp::application(argc, argv));
+    QApplication app(argc, argv);
 
-    app->setApplicationName("GagBook");
-    app->setOrganizationName("GagBook");
-    app->setApplicationVersion(APP_VERSION);
+    app.setApplicationName("GagBook");
+    app.setOrganizationName("GagBook");
+    app.setApplicationVersion(APP_VERSION);
 
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 
@@ -73,5 +73,5 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     view->show();
 
 
-    return app->exec();
+    return app.exec();
 }
