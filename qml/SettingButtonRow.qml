@@ -48,7 +48,7 @@ Item {
         text: root.text
     }
 
-    ButtonRow {
+    Row {
         id: buttonRow
         anchors {
             top: settingText.bottom

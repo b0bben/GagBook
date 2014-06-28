@@ -27,48 +27,31 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import QtWebKit 1.0
 
 Page {
     id: commentsPage
 
     property string gagURL
-
-    tools: ToolBarLayout {
-        ToolIcon {
-            platformIconId: "toolbar-back"
-            onClicked: pageStack.pop()
-        }
-    }
-
-    Flickable {
-        id: webViewFlickable
-        anchors { top: pageHeader.bottom; bottom: parent.bottom; left: parent.left; right: parent.right }
-        contentHeight: commentsWebView.height
-
-        WebView {
-            id: commentsWebView
-            preferredHeight: webViewFlickable.height
-            preferredWidth: webViewFlickable.width
-
-            onLoadStarted: pageHeader.busy = true
-            onLoadFailed: pageHeader.busy = false
-            onLoadFinished: pageHeader.busy = false
-        }
-    }
-
-    ScrollDecorator { flickableItem: webViewFlickable }
+    property string rootUrl: "http://comment.9gag.com/comment/list?url=%1" +
+            "&appId=a_dd8f2b7d304a10edaf6f29517ea0ca4100a43d1b&readOnly=1"
 
     PageHeader {
         id: pageHeader
-        anchors { top: parent.top; left: parent.left; right: parent.right }
-        text: "Comments"
-        onClicked: webViewFlickable.contentY = 0;
+        title: "Comments"
     }
 
-    Component.onCompleted: {
+    SilicaWebView {
+        id: commentsWebView
+        anchors {top: pageHeader.bottom}
+        url: rootUrl.arg(gagURL)
+        onLoadingChanged: console.log("page load status: " + loadRequest.status)
+    }
+
+    ScrollDecorator { flickable: commentsWebView }
+
+    /*Component.onCompleted: {
         var url = "http://comment.9gag.com/comment/list?url=%1" +
                 "&appId=a_dd8f2b7d304a10edaf6f29517ea0ca4100a43d1b&readOnly=1"
         commentsWebView.url = url.arg(gagURL);
-    }
+    }*/
 }

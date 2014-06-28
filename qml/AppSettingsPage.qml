@@ -32,11 +32,9 @@ import GagBook 1.0
 Page {
     id: settingsPage
 
-    tools: ToolBarLayout {
-        ToolIcon {
-            platformIconId: "toolbar-back"
-            onClicked: pageStack.pop()
-        }
+    PageHeader {
+        id: pageHeader
+        title: "App Settings"
     }
 
     Flickable {
@@ -80,12 +78,5 @@ Page {
         }
     }
 
-    ScrollDecorator { flickableItem: settingsFlickable }
-
-    PageHeader {
-        id: pageHeader
-        anchors { top: parent.top; left: parent.left; right: parent.right }
-        text: "App Settings"
-        enabled: false
-    }
+    ScrollDecorator { flickable: settingsFlickable }
 }

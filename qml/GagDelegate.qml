@@ -52,14 +52,11 @@ Item {
             anchors { left: parent.left; right: parent.right; margins: Theme.paddingMedium  }
             spacing: Theme.paddingMedium
 
-            CustomCountBubble {
-                value: model.votesCount
-                text: "points"
-            }
-
-            CustomCountBubble {
-                value: model.commentsCount
-                text: "comments"
+            Text {
+                id: commentsVotesCountTxt
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryColor
+                text: model.votesCount + " points • " + model.commentsCount + " comments"
             }
 
         }
@@ -251,6 +248,27 @@ Item {
             }
         }
 
+        Row {
+            anchors {left:parent.left; right:parent.right; margins: Theme.paddingMedium}
+            height: childrenRect.height
+            spacing: 10
+
+            IconButton {
+                icon.source: "image://theme/icon-m-up"
+            }
+            IconButton {
+                icon.source: "image://theme/icon-m-down"
+            }
+            IconButton {
+                icon.source: "image://theme/icon-m-message"
+                onClicked: pageStack.push(Qt.resolvedUrl("CommentsPage.qml"), { gagURL: model.url })
+            }
+            IconButton {
+                icon.source: "image://theme/icon-m-share"
+                onClicked: QMLUtils.shareLink(model.url, model.title)
+            }
+        }
+
         /*ButtonRow{
             anchors { left: parent.left; right: parent.right; margins: constant.paddingMedium }
             height: childrenRect.height
@@ -304,6 +322,6 @@ Item {
         id: seperator
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
         height: 1
-        color: "white"
+        color: Theme.secondaryColor
     }
 }

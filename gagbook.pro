@@ -5,11 +5,13 @@ TARGET = gagbook
 VERSION = 0.9.0
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
-QT += network
+QT += network xml xmlpatterns
 
 # Qt-Json
-HEADERS += qt-json/json.h
-SOURCES += qt-json/json.cpp
+HEADERS += qt-json/json.h \
+    src/ninegagrequest.h
+SOURCES += qt-json/json.cpp \
+    src/ninegagrequest.cpp
 
 HEADERS += \
     src/qmlutils.h \

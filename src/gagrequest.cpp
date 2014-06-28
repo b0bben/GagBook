@@ -54,12 +54,15 @@ void GagRequest::send()
 void GagRequest::onFinished()
 {
     if (m_reply->error()) {
+        qDebug("response error");
+
         emit failure(m_reply->errorString());
         m_reply->deleteLater();
         m_reply = 0;
         return;
     }
 
+    qDebug("received response");
     QByteArray response = m_reply->readAll();
     m_reply->deleteLater();
     m_reply = 0;

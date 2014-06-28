@@ -37,12 +37,12 @@ Item {
     height: valueText.paintedHeight + 2 * Theme.paddingSmall
     width: valueText.paintedWidth + 2 * Theme.paddingMedium
 
-    Rectangle {
+    /*Rectangle {
         id: background
         anchors.fill: parent
         radius: Theme.paddingLarge
         color: "#000"
-    }
+    }*/
 
     Text {
         id: valueText

@@ -31,13 +31,6 @@ import Sailfish.Silica 1.0
 Page {
     id: aboutPage
 
-    tools: ToolBarLayout {
-        ToolIcon {
-            platformIconId: "toolbar-back"
-            onClicked: pageStack.pop()
-        }
-    }
-
     Flickable {
         id: aboutPageFlickable
         anchors { top: pageHeader.bottom; bottom: parent.bottom; left: parent.left; right: parent.right }
@@ -45,24 +38,24 @@ Page {
 
         Column {
             id: column
-            anchors { left: parent.left; right: parent.right; top: parent.top; margins: constant.paddingMedium }
+            anchors { left: parent.left; right: parent.right; top: parent.top; margins: Theme.paddingMedium }
             height: childrenRect.height
-            spacing: constant.paddingMedium
+            spacing: Theme.paddingMedium
 
             Text {
                 anchors { left: parent.left; right: parent.right }
-                font.pixelSize: constant.fontSizeXXLarge
+                font.pixelSize: Theme.fontSizeExtraLarge
                 horizontalAlignment: Text.AlignHCenter
-                color: constant.colorLight
+                color: Theme.primaryColor
                 font.bold: true
                 text: "GagBook"
             }
 
             Text {
                 anchors { left: parent.left; right: parent.right }
-                font.pixelSize: constant.fontSizeMedium
+                font.pixelSize: Theme.fontSizeMedium
                 horizontalAlignment: Text.AlignHCenter
-                color: constant.colorLight
+                color: Theme.primaryColor
                 wrapMode: Text.Wrap
                 textFormat: Text.RichText
                 text: "v" + APP_VERSION + "<br>\
@@ -76,9 +69,9 @@ and <a href=\"http://9gag.com/privacy\">Privacy Policy</a>.<br>"
 
             Text {
                 anchors { left: parent.left; right: parent.right }
-                font.pixelSize: constant.fontSizeMedium
+                font.pixelSize: Theme.fontSizeMedium
                 horizontalAlignment: Text.AlignHCenter
-                color: constant.colorLight
+                color: Theme.primaryColor
                 wrapMode: Text.Wrap
                 textFormat: Text.PlainText
                 text: "~ " + gagbookManager.downloadCounter + " MB downloaded"
@@ -98,12 +91,10 @@ and <a href=\"http://9gag.com/privacy\">Privacy Policy</a>.<br>"
         }
     }
 
-    ScrollDecorator { flickableItem: aboutPageFlickable }
+    ScrollDecorator { flickable: aboutPageFlickable }
 
     PageHeader {
         id: pageHeader
-        anchors { top: parent.top; left: parent.left; right: parent.right }
-        text: "About"
-        enabled: false
+        title: "About"
     }
 }

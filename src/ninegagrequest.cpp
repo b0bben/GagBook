@@ -28,10 +28,11 @@
 #include "ninegagrequest.h"
 
 #include <QtCore/QRegExp>
-#include <QtWebKit/QWebPage>
-#include <QtWebKit/QWebFrame>
-#include <QtWebKit/QWebElement>
-#include <QtWebKit/QWebElementCollection>
+#include <QUrl>
+#include <QUrlQuery>
+#include <QtXml>
+#include <QTextDocument>
+#include <QXmlQuery>
 
 #include "networkmanager.h"
 
@@ -43,86 +44,145 @@ NineGagRequest::NineGagRequest(NetworkManager *networkManager, const QString &se
 QNetworkReply *NineGagRequest::createRequest(const QString &section, const QString &lastId)
 {
     QUrl requestUrl("http://9gag.com/" + section);
-    if (!lastId.isEmpty())
-        requestUrl.addQueryItem("id", lastId);
+    QUrlQuery q;
+    if (!lastId.isEmpty()) {
+        q.addQueryItem("id", lastId);
+        requestUrl.setQuery(q);
+    }
 
     return networkManager()->createGetRequest(requestUrl, NetworkManager::JSON);
 }
 
-static QWebElementCollection getEntryItemsFromHtml(const QString &html);
-static QWebElementCollection getEntryItemsFromJson(const QString &json);
-static QList<GagObject> parseGAG(const QWebElementCollection &entryItems);
+static QList<GagObject> getEntryItemsFromHtml(const QString &html);
+static QList<GagObject> getEntryItemsFromJson(const QString &json);
+static GagObject parseGag(QXmlStreamReader &xml);
 
 QList<GagObject> NineGagRequest::parseResponse(const QByteArray &response)
 {
-    return parseGAG(getEntryItemsFromJson(QString::fromUtf8(response)));
-}
-
-static QWebElementCollection getEntryItemsFromHtml(const QString &html)
-{
-    QWebPage webPage;
-    // disable JavaScript and rendering of external object
-    webPage.settings()->setAttribute(QWebSettings::AutoLoadImages, false);
-    webPage.settings()->setAttribute(QWebSettings::JavascriptEnabled, false);
-    webPage.settings()->setAttribute(QWebSettings::PrintElementBackgrounds, false);
-    webPage.settings()->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, false);
-    webPage.settings()->setAttribute(QWebSettings::LocalContentCanAccessFileUrls, false);
-
-    webPage.mainFrame()->setHtml(html);
-    return webPage.mainFrame()->findAllElements("article");
+    qDebug("parsing response...");
+    return getEntryItemsFromJson(QString::fromUtf8(response));
 }
 
 // can not use Qt-Json to parse this JSON because it will cause the order
 // of entry-item to be sorted when parsed into a QVariantMap
-static QWebElementCollection getEntryItemsFromJson(const QString &json)
+static QList<GagObject> getEntryItemsFromJson(const QString &json)
 {
-    QString html = "<html>";
+    QBuffer device;
+    device.setData(json.toUtf8());
+    device.open(QIODevice::ReadOnly);
 
-    QRegExp entryItemsRx("<article.+<\\\\/article>");
-    entryItemsRx.setMinimal(true);
-    int pos = 0;
-    while ((pos = entryItemsRx.indexIn(json, pos)) != -1) {
-        html += entryItemsRx.cap().remove('\\');
-        pos += entryItemsRx.matchedLength();
+    QXmlQuery query;
+    query.bindVariable("inputDocument", &device);
+    query.setQuery("doc($inputDocument)/article");
+
+    QString r;
+    query.evaluateTo(&r);
+
+    qDebug() << r;
+
+    QList<GagObject> gags;
+    return gags;
+    //return getEntryItemsFromHtml(html);
+}
+
+static QList<GagObject> getEntryItemsFromHtml(const QString &html)
+{
+    QList<GagObject> gags;
+
+    QXmlStreamReader xml(html);
+    xml.setNamespaceProcessing(false);
+    /* We'll parse the XML until we reach end of it.*/
+    while(!xml.atEnd() &&
+          !xml.hasError()) {
+        /* Read next element.*/
+        QXmlStreamReader::TokenType token = xml.readNext();
+        qDebug("readNext");
+        /* If token is just StartDocument, we'll go to next.*/
+        if(token == QXmlStreamReader::Invalid || token == QXmlStreamReader::StartDocument) {
+            continue;
+        }
+        /* If token is StartElement, we'll see if we can read it.*/
+        if(token == QXmlStreamReader::StartElement) {
+            /* If it's an article, we'll dig the information from there.*/
+            if(xml.name() == "article") {
+                qDebug("found article, parsing...");
+                gags.append(parseGag(xml));
+            }
+        }
+        else
+            continue;
+    }
+    /* Error handling. */
+    if(xml.hasError()) {
+        qDebug() << xml.errorString();
+    }
+    /* Removes any device() or data from the reader
+        * and resets its internal state to the initial state. */
+    xml.clear();
+
+    return gags;
+}
+
+static GagObject parseGag(QXmlStreamReader& xml) {
+    GagObject gag;
+    /* Let's check that we're really getting a person. */
+    if(xml.tokenType() != QXmlStreamReader::StartElement &&
+            xml.name() == "article") {
+        return gag;
+    }
+    /* Let's get the attributes for person */
+    QXmlStreamAttributes attributes = xml.attributes();
+    /* Let's check that person has id attribute. */
+    if(attributes.hasAttribute("data-entry-id")) {
+        /* We'll add it to the map. */
+        gag.setId(attributes.value("data-entry-id").toString());
     }
 
-    html += "</html>";
+    if(attributes.hasAttribute("data-entry-url")) {
+        /* We'll add it to the map. */
+        gag.setUrl(attributes.value("data-entry-url").toString());
+    }
 
-    return getEntryItemsFromHtml(html);
+    if(attributes.hasAttribute("data-entry-votes")) {
+        /* We'll add it to the map. */
+        qDebug() << "votes: " << attributes.value("data-entry-votes").toInt();
+        gag.setVotesCount(attributes.value("data-entry-votes").toInt());
+    }
+
+    if(attributes.hasAttribute("data-entry-comments")) {
+        /* We'll add it to the map. */
+        qDebug() << "comments: " << attributes.value("data-entry-comments").toInt();
+        gag.setCommentsCount(attributes.value("data-entry-comments").toInt());
+    }
+
+    /* Next element... */
+    xml.readNext();
+    /*
+     * We're going to loop over the things because the order might change.
+     * We'll continue the loop until we hit an EndElement named person.
+     */
+    while(!(xml.tokenType() == QXmlStreamReader::EndElement &&
+            xml.name() == "article")) {
+        if(xml.tokenType() == QXmlStreamReader::StartElement) {
+            /* We've found title. */
+            if(xml.name() == "a") {
+                qDebug() << "title: " << xml.text().toString();
+                gag.setTitle(xml.text().toString());
+            }
+            /* We've found image. */
+            if(xml.name() == "img") {
+                if(attributes.hasAttribute("class") && attributes.value("class").toString() == "badge-item-img") {
+                    qDebug() << "img url: " << xml.text().toString();
+                    gag.setImageUrl(attributes.value("src").toString());
+                }
+            }
+        }
+        /* ...and next... */
+        xml.readNext();
+    }
+
+    qDebug("parseGag END");
+    return gag;
 }
 
 static const QRegExp dataScriptImgSrcRegExp("<img.*src=\"(http[^\\s\"]+)\".*\\/>");
-
-static QList<GagObject> parseGAG(const QWebElementCollection &entryItems)
-{
-    QList<GagObject> gagList;
-
-    foreach (const QWebElement &element, entryItems) {
-        GagObject gag;
-        gag.setId(element.attribute("data-entry-id"));
-        gag.setUrl(element.attribute("data-entry-url"));
-        gag.setVotesCount(element.attribute("data-entry-votes").toInt());
-        gag.setCommentsCount(element.attribute("data-entry-comments").toInt());
-        gag.setTitle(element.findFirst("a").toPlainText().trimmed());
-
-        const QWebElement postContainer = element.findFirst("div.post-container");
-        if (!postContainer.findFirst("div.nsfw-post").isNull()) {
-            gag.setIsNSFW(true);
-        } else if (!postContainer.findFirst("span.play").isNull()) {
-            if (!postContainer.findFirst("div.video-post").isNull()) {
-                gag.setIsVideo(true);
-                gag.setImageUrl(postContainer.findFirst("img.youtube-thumb").attribute("src"));
-            } else {
-                gag.setIsGIF(true);
-                gag.setImageUrl(postContainer.findFirst("img.badge-item-img").attribute("src"));
-                gag.setGifImageUrl(postContainer.findFirst("div.badge-animated-container-animated").attribute("data-image"));
-            }
-        } else {
-            gag.setImageUrl(postContainer.findFirst("img.badge-item-img").attribute("src"));
-        }
-
-        gagList.append(gag);
-    }
-
-    return gagList;
-}

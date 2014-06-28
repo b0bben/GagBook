@@ -33,6 +33,7 @@
 #include "appsettings.h"
 #include "networkmanager.h"
 #include "infinigagrequest.h"
+#include "ninegagrequest.h"
 #include "gagimagedownloader.h"
 
 GagModel::GagModel(QObject *parent) :

@@ -54,28 +54,19 @@ Page {
             platformIconId: "toolbar-view-menu"
             onClicked: mainMenu.open()
         }
-    }
-
-    Menu {
-        id: mainMenu
-
-        MenuLayout {
-            MenuItem {
-                text: "App Settings"
-                onClicked: pageStack.push(Qt.resolvedUrl("AppSettingsPage.qml"))
-            }
-            MenuItem {
-                text: "About GagBook"
-                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
-            }
-        }
     }*/
 
     ListView {
         id: gagListView
-        anchors { top: pageHeader.bottom; left: parent.left; right: parent.right; bottom: parent.bottom }
+        anchors.fill: parent
         model: gagModel
         orientation: ListView.Vertical
+        header:     PageHeader {
+            id: pageHeader
+            title: "/" + appSettings.sections[gagModel.selectedSection]
+            /*busy: gagModel.busy
+            onClicked: gagListView.positionViewAtBeginning()*/
+        }
         delegate: GagDelegate {}
         footer: Item {
             width: ListView.view.width
@@ -108,16 +99,25 @@ Page {
         }
 
         onAtYEndChanged: if (atYEnd && !gagModel.busy && count > 0) gagModel.refresh(GagModel.RefreshOlder)
-    }
 
-    PageHeader {
-        id: pageHeader
-        anchors { top: parent.top; left: parent.left; right: parent.right }
-        title: "/" + appSettings.sections[gagModel.selectedSection]
-        /*busy: gagModel.busy
-        onClicked: gagListView.positionViewAtBeginning()*/
+        PullDownMenu {
+            MenuItem {
+                text: "About GagBook"
+                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
+            }
+            MenuItem {
+                text: "More sections..."
+                onClicked: dialogManager.createSectionDialog()
+            }
+            MenuItem {
+                text: gagModel.selectedSection == 0 ? "Trending" : "Hot"
+                onClicked: {
+                    gagModel.selectedSection = gagModel.selectedSection == 0 ? 1:0;
+                    gagModel.refresh(GagModel.RefreshAll);
+                }
+            }
+        }
     }
-
     GagModel {
         id: gagModel
         manager: gagbookManager

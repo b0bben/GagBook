@@ -33,29 +33,8 @@ Page {
 
     property variant gag
 
-    tools: ToolBarLayout {
-
-        ToolIcon {
-            platformIconId: "toolbar-back"
-            onClicked: pageStack.pop()
-        }
-        ToolIcon {
-            platformIconId: "toolbar-undo" + (enabled ? "" : "-dimmed")
-            enabled: gagImage.scale != pinchArea.minScale
-            onClicked: {
-                flickable.returnToBounds()
-                bounceBackAnimation.to = pinchArea.minScale
-                bounceBackAnimation.start()
-            }
-        }
-    }
-
     // to make the image outside of the page not visible during page transitions
     clip: true
-    states: State {
-        name: "SilderVisible"
-        AnchorChanges { target: zoomSlider; anchors.left: undefined; anchors.right: imagePage.right }
-    }
     transitions: Transition { AnchorAnimation { duration: 250; easing.type: Easing.InOutQuad } }
 
     Flickable {
@@ -179,35 +158,12 @@ Page {
             BusyIndicator {
                 id: busyIndicator
                 running: true
-                platformStyle: BusyIndicatorStyle { size: "large" }
+                size: BusyIndicatorSize.Large
             }
         }
 
         Component { id: failedLoading; Label { text: "Error loading image" } }
     }
 
-    ScrollDecorator { flickableItem: flickable }
-
-    Slider {
-        id: zoomSlider
-        anchors { verticalCenter: parent.verticalCenter; left: parent.right; margins: constant.paddingMedium }
-        enabled: gagImage.status == Image.Ready
-        height: parent.height * 0.6
-        opacity: pressed ? 1 : 0.5
-        minimumValue: pinchArea.minScale
-        maximumValue: pinchArea.maxScale
-        stepSize: (maximumValue - minimumValue) / 20
-        orientation: Qt.Vertical
-        value: gagImage.scale
-
-        Behavior on opacity { NumberAnimation { duration: 150 } }
-
-        // When pressed, bind image scale to slider value
-        Binding {
-            target: gagImage
-            property: "scale"
-            value: zoomSlider.value
-            when: zoomSlider.pressed
-        }
-    }
+    ScrollDecorator { flickable: flickable }
 }
