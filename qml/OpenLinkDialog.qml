@@ -33,32 +33,18 @@ ContextMenu {
 
     property string link
 
-    platformTitle: Text {
-        anchors { left: parent.left; right: parent.right }
-        horizontalAlignment: Text.AlignHCenter
-        text: link
-        font.italic: true
-        font.pixelSize: constant.fontSizeMedium
-        color: constant.colorLight
-        elide: Text.ElideRight
-        maximumLineCount: 3
-        wrapMode: Text.WrapAnywhere
-    }
-
-    MenuLayout {
-        MenuItem {
-            text: "Open link in web browser"
-            onClicked: {
-                Qt.openUrlExternally(link)
-                infoBanner.alert("Launching web browser...")
-            }
+    MenuItem {
+        text: "Open link in web browser"
+        onClicked: {
+            Qt.openUrlExternally(link)
+            infoBanner.showText("Launching web browser...")
         }
-        MenuItem {
-            text: "Copy link"
-            onClicked: {
-                QMLUtils.copyToClipboard(link)
-                infoBanner.alert("Link copied to clipboard")
-            }
+    }
+    MenuItem {
+        text: "Copy link"
+        onClicked: {
+            QMLUtils.copyToClipboard(link)
+            infoBanner.showText("Link copied to clipboard")
         }
     }
 }

@@ -37,11 +37,14 @@ Page {
     clip: true
     transitions: Transition { AnchorAnimation { duration: 250; easing.type: Easing.InOutQuad } }
 
-    Flickable {
+    SilicaFlickable {
         id: flickable
         anchors.fill: parent
         contentWidth: imageContainer.width; contentHeight: imageContainer.height
         onHeightChanged: if (gagImage.status == Image.Ready) gagImage.fitToScreen()
+
+        VerticalScrollDecorator{}
+        HorizontalScrollDecorator{}
 
         Item {
             id: imageContainer
@@ -65,7 +68,7 @@ Page {
                 cache: false
                 fillMode: Image.PreserveAspectFit
                 // pause the animation when app is in background
-                paused: imagePage.status != PageStatus.Active || !Qt.application.active
+                //paused: imagePage.status != PageStatus.Active || !Qt.application.active
                 source: gag.isGIF ? gag.gifImageUrl : gag.imageUrl
 
                 onScaleChanged: {
@@ -82,9 +85,9 @@ Page {
 
                 onStatusChanged: {
                     if (status == Image.Ready) {
+                        console.log("ImagePage_onStatusChanged: Image.Ready")
                         fitToScreen()
                         loadedAnimation.start()
-                        imagePage.state = "SilderVisible";
                     }
                 }
 
@@ -135,7 +138,6 @@ Page {
         MouseArea {
             anchors.fill: parent
             enabled: gagImage.status == Image.Ready
-            onClicked: imagePage.state = (imagePage.state ? "" : "SilderVisible")
         }
     }
 
@@ -164,6 +166,4 @@ Page {
 
         Component { id: failedLoading; Label { text: "Error loading image" } }
     }
-
-    ScrollDecorator { flickable: flickable }
 }

@@ -15,7 +15,7 @@ Name:       gagbook
 Summary:    An unofficial app for 9GAG website
 Version:    0.9.0
 Release:    1
-Group:      Qt/Qt
+Group:      Applications/Internet
 License:    LICENSE
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  gagbook.yaml
@@ -25,6 +25,7 @@ Requires:   qt5-qtdeclarative-systeminfo
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Core)
+BuildRequires:  pkgconfig(Qt5SystemInfo)
 BuildRequires:  pkgconfig(qdeclarative5-boostable)
 BuildRequires:  desktop-file-utils
 
@@ -42,7 +43,8 @@ GagBook is an unofficial mobile app for 9GAG website that allows you to view pos
 # >> build pre
 # << build pre
 
-%qtc_qmake5 
+%qtc_qmake5  \
+    VERSION=%{version}
 
 %qtc_make %{?_smp_mflags}
 

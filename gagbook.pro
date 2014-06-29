@@ -2,7 +2,7 @@ CONFIG += sailfishapp
 
 TARGET = gagbook
 
-VERSION = 0.9.0
+#see gagbook.yml for version setting
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 QT += network widgets webkitwidgets
@@ -42,7 +42,7 @@ OTHER_FILES += \
     README.md \
     LICENSE \
     qml/* \
-    qml/Images/* \
+    qml/Images/*.png \
     gagbook.desktop \
     rpm/gagbook.yaml \
     gagbook.png

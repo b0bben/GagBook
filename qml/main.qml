@@ -27,6 +27,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import QtSystemInfo 5.0
 import GagBook 1.0
 
 ApplicationWindow {
@@ -35,18 +36,39 @@ ApplicationWindow {
     //showStatusBar: inPortrait
     initialPage: MainPage { id: mainPage }
 
-    /*InfoBanner {
-        id: infoBanner
-        topMargin: showStatusBar ? 40 : 8
-
-        function alert(text) {
-            infoBanner.text = text
-            infoBanner.show()
-        }
-    }*/
-
     GagBookManager {
         id: gagbookManager
         settings: AppSettings { id: appSettings }
+
+    }
+
+    Component.onCompleted: {
+        //check connectivity, show error page if no connection
+        checkNetworkAvailabilty();
+    }
+
+    function checkNetworkAvailabilty() {
+        console.log(netInfo.currentNetworkMode);
+        if (netInfo.currentNetworkMode == NetworkInfo.NoNetworkAvailable) {
+            console.log("no internet connection or 9gag connection available");
+            mainPage.state = "noConnection";
+        }
+        else {
+            console.log("Internet available, continuing...");
+            mainPage.state = "hasConnection";
+        }
+    }
+
+    function networkStatusChanged() {
+        console.log("Network status changed to: " + netInfo);
+    }
+
+    NetworkInfo {
+        id: netInfo
+    }
+
+    Connections {
+        target: netInfo
+        onNetworkStatusChanged: networkStatusChanged()
     }
 }

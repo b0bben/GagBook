@@ -32,41 +32,21 @@ import GagBook 1.0
 Page {
     id: mainPage
 
-    /*tools: ToolBarLayout {
-        ToolIcon {
-            platformIconId: "toolbar-back-dimmed"
-            enabled: false
-        }
-        ToolIcon {
-            platformIconId: "toolbar-list"
-            onClicked: dialogManager.createSectionDialog()
-        }
-        ToolIcon {
-            platformIconId: gagModel.busy ? "toolbar-stop" : "toolbar-refresh"
-            onClicked: {
-                if (gagModel.busy)
-                    gagModel.stopRefresh();
-                else
-                    gagModel.refresh(GagModel.RefreshAll)
-            }
-        }
-        ToolIcon {
-            platformIconId: "toolbar-view-menu"
-            onClicked: mainMenu.open()
-        }
-    }*/
-
-    ListView {
+    SilicaListView {
         id: gagListView
         anchors.fill: parent
         model: gagModel
         orientation: ListView.Vertical
-        header:     PageHeader {
-            id: pageHeader
-            title: "/" + appSettings.sections[gagModel.selectedSection]
-            /*busy: gagModel.busy
-            onClicked: gagListView.positionViewAtBeginning()*/
+        header: PageHeader {title: "/" + appSettings.sections[gagModel.selectedSection]}
+
+        ViewPlaceholder {
+            id: placeHolder
+            text: "Loading..."
+            enabled: gagListView.count == 0 && !gagModel.busy
+            hintText: qsTr("Couldn't get any gags.\nCheck your WiFi or 3G settings." +
+                           "\nTry refreshing from the menu. ")
         }
+
         delegate: GagDelegate {}
         footer: Item {
             width: ListView.view.width
@@ -116,12 +96,22 @@ Page {
                     gagModel.refresh(GagModel.RefreshAll);
                 }
             }
+            MenuItem {
+                text: "Refresh"
+                onClicked: {
+                    gagModel.refresh(GagModel.RefreshAll);
+                }
+            }
         }
     }
     GagModel {
         id: gagModel
         manager: gagbookManager
-        onRefreshFailure: infoBanner.alert(errorMessage);
+        onBusyChanged: state = "hasConnection";
+        onRefreshFailure: {
+            console.log("refresh failed");
+            state = "noConnection";
+        }
     }
 
     QtObject {

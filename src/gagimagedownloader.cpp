@@ -35,6 +35,7 @@
 #endif
 #include <QtGui/QImageReader>
 #include <QtNetwork/QNetworkReply>
+#include <QDebug>
 
 #include "networkmanager.h"
 
@@ -88,11 +89,11 @@ void GagImageDownloader::start()
         if (gag.imageUrl().isEmpty() && gag.gifImageUrl().isEmpty())
             continue;
 
-        if (m_downloadGIF && !gag.isGIF()) {
-            qWarning("GagImageDownloader::start(): Not GIF, skip");
-            continue;
-        }
-        const QUrl downloadImageUrl = m_downloadGIF ? gag.gifImageUrl() : gag.imageUrl();
+//        if (m_downloadGIF && !gag.isGIF()) {
+//            qWarning("GagImageDownloader::start(): Not GIF, skip");
+//            continue;
+//        }
+        const QUrl downloadImageUrl = gag.isGIF() ? gag.gifImageUrl() : gag.imageUrl();
         QNetworkReply *reply = m_networkManager->createGetRequest(downloadImageUrl, NetworkManager::Image);
         // make sure the QNetworkReply will be destroy when this object is destroyed
         reply->setParent(this);

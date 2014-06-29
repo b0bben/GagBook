@@ -61,8 +61,9 @@ Item {
 
         }
 
-        Image {
+        AnimatedImage {
             id: gagImage
+            paused: true
 
             function __calculateImageHeight() {
                 var width = 460, height = model.imageHeight;
@@ -71,14 +72,14 @@ Item {
                     height = QMLUtils.IMAGE_MAX_HEIGHT;
                 }
                 if (width > gagImage.width)
-                   height *= gagImage.width / width;
+                    height *= gagImage.width / width;
                 return height || gagImage.width;
             }
 
             anchors { left: parent.left; right: parent.right }
             height: __calculateImageHeight()
-            sourceSize.height: QMLUtils.IMAGE_MAX_HEIGHT
-            asynchronous: true
+            //sourceSize.height: QMLUtils.IMAGE_MAX_HEIGHT
+            asynchronous: false
             smooth: !root.ListView.view.moving
             cache: false
             fillMode: Image.PreserveAspectFit
@@ -87,6 +88,7 @@ Item {
             Loader {
                 id: errorTextLoader
                 anchors.fill: parent
+                visible: gagImage.paused
                 sourceComponent: {
                     if (model.isNSFW) return nsfwText;
                     if (!gagImage.source.toString()) {
@@ -208,7 +210,6 @@ Item {
 
                 Component {
                     id: gifPlayIcon
-
                     Item {
                         Image {
                             anchors.centerIn: parent
@@ -232,18 +233,28 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    if (model.isNSFW) return;
-                    if (model.isVideo) {
-                        Qt.openUrlExternally(model.url);
-                        return;
+                    if (model.isGIF && !model.gifImageUrl.toString()) {
+                        if (gagImage.paused) {
+                            console.log("wants to play gif");
+                            gagImage.paused = false;
+                        }
+                        else {
+                            console.log("wants to stop gif");
+                            gagImage.paused = true;
+                        }
                     }
-                    if (!gagImage.source.toString()) {
-                        gagModel.downloadImage(index);
-                        return;
+                    else {
+                        if (model.isNSFW) return;
+                        if (model.isVideo) {
+                            Qt.openUrlExternally(model.url);
+                            return;
+                        }
+                        if (!gagImage.source.toString()) {
+                            gagModel.downloadImage(index);
+                            return;
+                        }
+                        pageStack.push(Qt.resolvedUrl("ImagePage.qml"), { gag: model });
                     }
-                    if (model.isGIF && !model.gifImageUrl.toString())
-                        gagModel.downloadImage(index);
-                    pageStack.push(Qt.resolvedUrl("ImagePage.qml"), { gag: model })
                 }
             }
         }
