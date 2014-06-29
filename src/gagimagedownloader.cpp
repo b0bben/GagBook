@@ -136,7 +136,21 @@ void GagImageDownloader::onFinished()
             } else {
                 gag.setImageUrl(QUrl::fromLocalFile(fileName));
             }
-            gag.setImageHeight(QImageReader(&image).size().height());
+
+            //do some resizing magic to get proper images
+            QSize requestedSize(500,QImageReader(&image).size().height());
+            QImage image(fileName);
+            QImage result;
+            if (requestedSize.isValid())
+                result = image.scaled(requestedSize, Qt::KeepAspectRatio);
+            else
+                result = image;
+
+            result.save(fileName);
+
+            //save height in model for laterz
+            gag.setImageHeight(requestedSize.height());
+
         } else {
             qWarning("GagImageDownloader::onFinished(): Unable to open QFile [with fileName = %s] for writing: %s",
                    qPrintable(fileName), qPrintable(image.errorString()));

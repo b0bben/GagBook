@@ -66,7 +66,7 @@ Item {
             paused: true
 
             function __calculateImageHeight() {
-                var width = 460, height = model.imageHeight;
+                var width = 540, height = model.imageHeight;
                 if (height > QMLUtils.IMAGE_MAX_HEIGHT) {
                     width *= QMLUtils.IMAGE_MAX_HEIGHT / height;
                     height = QMLUtils.IMAGE_MAX_HEIGHT;
@@ -78,8 +78,9 @@ Item {
 
             anchors { left: parent.left; right: parent.right }
             height: __calculateImageHeight()
+            width: 540
             //sourceSize.height: QMLUtils.IMAGE_MAX_HEIGHT
-            asynchronous: false
+            asynchronous: true
             smooth: !root.ListView.view.moving
             cache: false
             fillMode: Image.PreserveAspectFit
