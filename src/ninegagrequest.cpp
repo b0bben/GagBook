@@ -60,7 +60,9 @@ static QList<GagObject> parseGAG(const QWebElementCollection &entryItems);
 
 QList<GagObject> NineGagRequest::parseResponse(const QByteArray &response)
 {
-    return parseGAG(getEntryItemsFromJson(QString::fromUtf8(response)));
+    qDebug() << "ineGagRequest::parseResponse: got response with length: " << response.length();
+
+    return parseGAG(getEntryItemsFromHtml(QString::fromUtf8(response)));
 }
 
 static QWebElementCollection getEntryItemsFromHtml(const QString &html)
@@ -75,25 +77,6 @@ static QWebElementCollection getEntryItemsFromHtml(const QString &html)
 
     webPage.mainFrame()->setHtml(html);
     return webPage.mainFrame()->findAllElements("article");
-}
-
-// can not use Qt-Json to parse this JSON because it will cause the order
-// of entry-item to be sorted when parsed into a QVariantMap
-static QWebElementCollection getEntryItemsFromJson(const QString &json)
-{
-    QString html = "<html>";
-
-    QRegExp entryItemsRx("<article.+<\\\\/article>");
-    entryItemsRx.setMinimal(true);
-    int pos = 0;
-    while ((pos = entryItemsRx.indexIn(json, pos)) != -1) {
-        html += entryItemsRx.cap().remove('\\');
-        pos += entryItemsRx.matchedLength();
-    }
-
-    html += "</html>";
-
-    return getEntryItemsFromHtml(html);
 }
 
 static const QRegExp dataScriptImgSrcRegExp("<img.*src=\"(http[^\\s\"]+)\".*\\/>");

@@ -35,6 +35,7 @@ ApplicationWindow {
 
     //showStatusBar: inPortrait
     initialPage: MainPage { id: mainPage }
+    cover: CoverPage{}
 
     GagBookManager {
         id: gagbookManager

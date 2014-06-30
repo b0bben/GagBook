@@ -41,10 +41,10 @@ Page {
 
         ViewPlaceholder {
             id: placeHolder
-            text: "Loading..."
+            text: "Couldn't get any gags"
             enabled: gagListView.count == 0 && !gagModel.busy
-            hintText: qsTr("Couldn't get any gags.\nCheck your WiFi or 3G settings." +
-                           "\nTry refreshing from the menu. ")
+            hintText: qsTr("Check your WiFi or 3G settings and" +
+                           "\ntry refreshing from the menu. ")
         }
 
         delegate: GagDelegate {}

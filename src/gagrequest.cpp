@@ -62,7 +62,6 @@ void GagRequest::onFinished()
         return;
     }
 
-    qDebug("received response");
     QByteArray response = m_reply->readAll();
     m_reply->deleteLater();
     m_reply = 0;

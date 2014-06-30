@@ -168,7 +168,6 @@ void GagModel::refresh(RefreshType refreshType)
         // fallthrough
     case AppSettings::NineGagSource:
     case AppSettings::InfiniGagSource:
-        qDebug() << "Using NineGagSource";
         m_request = new NineGagRequest(manager()->networkManager(), section, this);
         break;
     /*case AppSettings::InfiniGagSource:

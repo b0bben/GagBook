@@ -45,5 +45,6 @@ OTHER_FILES += \
     qml/Images/*.png \
     gagbook.desktop \
     rpm/gagbook.yaml \
-    gagbook.png
+    gagbook.png \
+    qml/CoverPage.qml
 
