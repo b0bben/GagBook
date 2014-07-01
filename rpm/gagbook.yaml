@@ -18,6 +18,7 @@ PkgConfigBR:
 - Qt5Core
 - Qt5SystemInfo
 - qdeclarative5-boostable
+
 Requires:
 - mapplauncherd-booster-silica-qt5
 - sailfishsilica-qt5

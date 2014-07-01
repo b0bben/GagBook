@@ -46,5 +46,7 @@ OTHER_FILES += \
     gagbook.desktop \
     rpm/gagbook.yaml \
     gagbook.png \
-    qml/CoverPage.qml
+    qml/CoverPage.qml \
+    qml/SelectionDialog.qml \
+    qml/SimpleListItem.qml
 

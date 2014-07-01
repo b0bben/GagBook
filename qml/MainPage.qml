@@ -108,7 +108,7 @@ Page {
         id: dialogManager
 
         property Component __listModelComponent: Component { ListModel {} }
-        property Component __selectionDialogComponent: Component { Dialog {} }
+        property Component __selectionDialogComponent: Component { SelectionDialog {} }
         property Component __openLinkDialogComponent: null
 
         function createSectionDialog() {
@@ -116,7 +116,7 @@ Page {
             var listModel = __listModelComponent.createObject(null);
             appSettings.sections.forEach(function(s) { listModel.append({ "text": s }) });
 
-            var p = { titleText: "Section", model: listModel, selectedIndex: gagModel.selectedSection }
+            var p = { title: "Section", model: listModel, selectedIndex: gagModel.selectedSection }
             var dialog = __selectionDialogComponent.createObject(mainPage, p);
             dialog.statusChanged.connect(function() {
                 if (dialog.status == DialogStatus.Closed) {
