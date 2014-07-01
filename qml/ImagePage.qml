@@ -67,6 +67,7 @@ Page {
                 smooth: !flickable.moving
                 cache: true
                 fillMode: Image.PreserveAspectFit
+                sourceSize.height: QMLUtils.IMAGE_MAX_HEIGHT
                 source: gag.isPartialImage ? gag.fullImageUrl : gag.imageUrl
 
                 onScaleChanged: {

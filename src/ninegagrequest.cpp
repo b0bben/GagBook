@@ -33,6 +33,7 @@
 #include <QWebElement>
 #include <QWebElementCollection>
 #include <QUrlQuery>
+#include <QUrl>
 #include <QDebug>
 
 #include "networkmanager.h"
@@ -112,8 +113,13 @@ static QList<GagObject> parseGAG(const QWebElementCollection &entryItems)
             }
         } else if(!element.findFirst("div.post-container.with-button").isNull()) {
             //not full pic, we'll need to go deeper for the full lenght image
-            const QString regularImgUrl = postContainer.findFirst("img.badge-item-img").attribute("src");
-            QString imgUrl = QString("http://d3dsacqprgcsqh.cloudfront.net/photo/%1_700b.jpg").arg(gag.id());
+            const QUrl regularImgUrl = QString(postContainer.findFirst("img.badge-item-img").attribute("src"));
+            const QUrl imgUrl = QString("%1/photo/%2_700b.jpg").arg(regularImgUrl.url(QUrl::RemovePath)).arg(gag.id());
+
+            Q_ASSERT(imgUrl.isValid());
+
+            qDebug() << "regularImgUrl: " << regularImgUrl;
+            qDebug() << "imgUrl: " << imgUrl;
 
             gag.setFullImageUrl(imgUrl);
             gag.setImageUrl(regularImgUrl);
