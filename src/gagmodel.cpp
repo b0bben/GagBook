@@ -44,6 +44,7 @@ GagModel::GagModel(QObject *parent) :
     _roles[TitleRole] = "title";
     _roles[UrlRole] = "url";
     _roles[ImageUrlRole] = "imageUrl";
+    _roles[FullImageUrlRole] = "fullImageUrl";
     _roles[GifImageUrlRole] = "gifImageUrl";
     _roles[ImageHeightRole] = "imageHeight";
     _roles[VotesCountRole] = "votesCount";
@@ -51,6 +52,7 @@ GagModel::GagModel(QObject *parent) :
     _roles[IsVideoRole] = "isVideo";
     _roles[IsNSFWRole] = "isNSFW";
     _roles[IsGIFRole] = "isGIF";
+    _roles[IsPartialImageRole] = "isPartialImage";
     _roles[IsDownloadingRole] = "isDownloading";
 }
 
@@ -89,6 +91,8 @@ QVariant GagModel::data(const QModelIndex &index, int role) const
         if (gag.imageUrl().scheme() != "file")
             return QUrl();
         return gag.imageUrl();
+    case FullImageUrlRole:
+        return gag.fullImageUrl();
     case GifImageUrlRole:
         if (gag.gifImageUrl().scheme() != "file")
             return QUrl();
@@ -105,6 +109,8 @@ QVariant GagModel::data(const QModelIndex &index, int role) const
         return gag.isNSFW();
     case IsGIFRole:
         return gag.isGIF();
+    case IsPartialImageRole:
+        return gag.isPartialImage();
     case IsDownloadingRole:
         return index.row() == m_downloadingIndex;
     default:
@@ -121,6 +127,11 @@ bool GagModel::isBusy() const
 qreal GagModel::progress() const
 {
     return m_progress;
+}
+
+int GagModel::gagCount() const
+{
+    return m_gagList.count();
 }
 
 GagBookManager *GagModel::manager() const
@@ -288,6 +299,7 @@ void GagModel::onDownloadFinished()
 
     m_busy = false;
     emit busyChanged();
+    emit countChanged();
 
     m_imageDownloader->deleteLater();
     m_imageDownloader = 0;

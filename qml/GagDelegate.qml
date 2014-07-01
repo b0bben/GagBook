@@ -83,8 +83,30 @@ Item {
             asynchronous: true
             smooth: !root.ListView.view.moving
             cache: false
-            fillMode: Image.PreserveAspectFit
+            fillMode: Image.Pad//Image.PreserveAspectFit
             source: model.imageUrl
+
+            Rectangle {
+                anchors {
+                    bottom: parent.bottom
+                }
+                width: 540
+                height: 100
+                color: "#25292C"
+                visible: model.isPartialImage
+
+                Label {
+                    text: "Click to see full image"
+                    anchors.centerIn: parent
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    color: Theme.primaryColor
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeSmall
+                    width: parent.width
+                    z: 999
+                }
+            }
 
             Loader {
                 id: errorTextLoader
@@ -255,6 +277,7 @@ Item {
                             return;
                         }
                         pageStack.push(Qt.resolvedUrl("ImagePage.qml"), { gag: model });
+
                     }
                 }
             }
@@ -280,54 +303,6 @@ Item {
                 onClicked: QMLUtils.shareLink(model.url, model.title)
             }
         }
-
-        /*ButtonRow{
-            anchors { left: parent.left; right: parent.right; margins: constant.paddingMedium }
-            height: childrenRect.height
-            exclusive: false
-
-            Button {
-                iconSource: "image://theme/icon-m-toolbar-new-message" + (appSettings.whiteTheme ? "" : "-selected")
-                onClicked: pageStack.push(Qt.resolvedUrl("CommentsPage.qml"), { gagURL: model.url })
-            }
-            Button {
-                iconSource: "image://theme/icon-l-browser-main-view"
-                onClicked: dialogManager.createOpenLinkDialog(model.url)
-            }
-            Button {
-                iconSource: "image://theme/icon-m-toolbar-share" + (appSettings.whiteTheme ? "" : "-selected")
-                onClicked: QMLUtils.shareLink(model.url, model.title);
-            }
-            Button {
-                property string __savedFilePath: ""
-                iconSource: {
-                    if (!__savedFilePath)
-                        return "image://theme/icon-s-transfer-download" + (appSettings.whiteTheme ? "" : "-inverse")
-                    else
-                        return "image://theme/icon-m-toolbar-gallery" + (appSettings.whiteTheme ? "" : "-selected")
-                }
-                onClicked: {
-                    if (!__savedFilePath) {
-                        if (model.isGIF && !model.gifImageUrl.toString()) {
-                            infoBanner.alert("You have to download the GIF first by clicking on the image");
-                            return;
-                        }
-                        __savedFilePath = QMLUtils.saveImage(model.isGIF ? model.gifImageUrl : model.imageUrl);
-                        if (__savedFilePath) {
-                            var displayPath = __savedFilePath;
-                            if (displayPath.indexOf("file://") == 0)
-                                displayPath = displayPath.substring(7);
-                            infoBanner.alert("Image saved to " + displayPath);
-                        } else {
-                            infoBanner.alert("Unable to save image");
-                        }
-                    } else {
-                        Qt.openUrlExternally(__savedFilePath);
-                        __savedFilePath = "";
-                    }
-                }
-            }
-        }*/
     }
 
     Rectangle {

@@ -42,6 +42,7 @@ class GagModel : public QAbstractListModel, public QQmlParserStatus
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
     Q_ENUMS(RefreshType)
+    Q_PROPERTY(int count READ gagCount NOTIFY countChanged)
     Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
     Q_PROPERTY(qreal progress READ progress NOTIFY progressChanged)
     Q_PROPERTY(GagBookManager *manager READ manager WRITE setManager)
@@ -51,6 +52,7 @@ public:
         TitleRole = Qt::UserRole,
         UrlRole,
         ImageUrlRole,
+        FullImageUrlRole,
         GifImageUrlRole,
         ImageHeightRole,
         VotesCountRole,
@@ -58,6 +60,7 @@ public:
         IsVideoRole,
         IsNSFWRole,
         IsGIFRole,
+        IsPartialImageRole,
         IsDownloadingRole
     };
 
@@ -77,6 +80,7 @@ public:
 
     bool isBusy() const;
     qreal progress() const;
+    int gagCount() const;
 
     GagBookManager *manager() const;
     void setManager(GagBookManager *manager);
@@ -89,6 +93,7 @@ public:
     Q_INVOKABLE void downloadImage(int i);
 
 signals:
+    void countChanged();
     void busyChanged();
     void progressChanged();
     void selectedSectionChanged();

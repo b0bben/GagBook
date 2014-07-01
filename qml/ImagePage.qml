@@ -51,7 +51,7 @@ Page {
             width: Math.max(gagImage.width * gagImage.scale, flickable.width)
             height: Math.max(gagImage.height * gagImage.scale, flickable.height)
 
-            AnimatedImage {
+            Image {
                 id: gagImage
 
                 property real prevScale
@@ -65,11 +65,9 @@ Page {
                 asynchronous: true
                 anchors.centerIn: parent
                 smooth: !flickable.moving
-                cache: false
+                cache: true
                 fillMode: Image.PreserveAspectFit
-                // pause the animation when app is in background
-                //paused: imagePage.status != PageStatus.Active || !Qt.application.active
-                source: gag.isGIF ? gag.gifImageUrl : gag.imageUrl
+                source: gag.isPartialImage ? gag.fullImageUrl : gag.imageUrl
 
                 onScaleChanged: {
                     if ((width * scale) > flickable.width) {
@@ -85,7 +83,6 @@ Page {
 
                 onStatusChanged: {
                     if (status == Image.Ready) {
-                        console.log("ImagePage_onStatusChanged: Image.Ready")
                         fitToScreen()
                         loadedAnimation.start()
                     }
@@ -135,10 +132,10 @@ Page {
             }
         }
 
-        MouseArea {
+        /*MouseArea {
             anchors.fill: parent
             enabled: gagImage.status == Image.Ready
-        }
+        }*/
     }
 
     Loader {

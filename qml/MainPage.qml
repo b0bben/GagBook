@@ -49,33 +49,21 @@ Page {
 
         delegate: GagDelegate {}
         footer: Item {
-            width: ListView.view.width
-            height: ListView.view.count > 0 ? footerColumn.height + 2 * Theme.paddingLarge
-                                            : ListView.view.height
+            //anchors.centerIn: parent
+            width: parent.width
+            height: gagModel.count > 0 ? 200 : ListView.view.height
             visible: gagModel.busy
 
-            Column {
-                id: footerColumn
-                anchors { left: parent.left; right: parent.right; verticalCenter: parent.verticalCenter }
-                height: childrenRect.height
-                spacing: Theme.paddingMedium
-
-                Text {
-                    anchors { left: parent.left; right: parent.right }
-                    horizontalAlignment: Text.AlignHCenter
-                    elide: Text.ElideRight
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.secondaryColor
-                    text: "Downloading..."
-                }
-
-                ProgressBar {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: parent.width * 0.75
-                    value: gagModel.progress
-                    indeterminate: gagModel.progress == 0
-                }
+            BusyIndicator {
+                id: partialProgressBar
+                anchors.margins: Theme.paddingLarge
+                anchors.centerIn: parent
+                size: gagModel.count > 0 ? BusyIndicatorSize.Medium : BusyIndicatorSize.Large
+                running: gagModel.busy
+                //value: gagModel.progress
+                //indeterminate: gagModel.progress == 0
             }
+
         }
 
         onAtYEndChanged: if (atYEnd && !gagModel.busy && count > 0) gagModel.refresh(GagModel.RefreshOlder)
@@ -107,10 +95,12 @@ Page {
     GagModel {
         id: gagModel
         manager: gagbookManager
-        onBusyChanged: state = "hasConnection";
         onRefreshFailure: {
             console.log("refresh failed");
             state = "noConnection";
+        }
+        onBusyChanged: {
+            console.log("working...");
         }
     }
 

@@ -41,10 +41,10 @@
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 static const QString IMAGE_CACHE_PATH = QDesktopServices::storageLocation(QDesktopServices::CacheLocation)
-         + "/gagbook";
+        + "/gagbook";
 #else
-    static const QString IMAGE_CACHE_PATH = QStandardPaths::writableLocation(QStandardPaths::CacheLocation)
-             + "/gagbook";
+static const QString IMAGE_CACHE_PATH = QStandardPaths::writableLocation(QStandardPaths::CacheLocation)
+        + "/gagbook";
 #endif
 
 void GagImageDownloader::initializeCache()
@@ -89,11 +89,12 @@ void GagImageDownloader::start()
         if (gag.imageUrl().isEmpty() && gag.gifImageUrl().isEmpty())
             continue;
 
-//        if (m_downloadGIF && !gag.isGIF()) {
-//            qWarning("GagImageDownloader::start(): Not GIF, skip");
-//            continue;
-//        }
+        //        if (m_downloadGIF && !gag.isGIF()) {
+        //            qWarning("GagImageDownloader::start(): Not GIF, skip");
+        //            continue;
+        //        }
         const QUrl downloadImageUrl = gag.isGIF() ? gag.gifImageUrl() : gag.imageUrl();
+
         QNetworkReply *reply = m_networkManager->createGetRequest(downloadImageUrl, NetworkManager::Image);
         // make sure the QNetworkReply will be destroy when this object is destroyed
         reply->setParent(this);
@@ -138,7 +139,7 @@ void GagImageDownloader::onFinished()
             }
 
             //do some resizing magic to get proper images
-            QSize requestedSize(500,QImageReader(&image).size().height());
+            QSize requestedSize(540,QImageReader(&image).size().height());
             QImage image(fileName);
             QImage result;
             if (requestedSize.isValid())
@@ -150,15 +151,14 @@ void GagImageDownloader::onFinished()
 
             //save height in model for laterz
             gag.setImageHeight(requestedSize.height());
-
         } else {
             qWarning("GagImageDownloader::onFinished(): Unable to open QFile [with fileName = %s] for writing: %s",
-                   qPrintable(fileName), qPrintable(image.errorString()));
+                     qPrintable(fileName), qPrintable(image.errorString()));
         }
     } else {
         if (reply->error() != QNetworkReply::OperationCanceledError) {
             qWarning("GagImageDownloader::onFinished(): Network error for [%s]: %s",
-                   qPrintable(reply->url().toString()), qPrintable(reply->errorString()));
+                     qPrintable(reply->url().toString()), qPrintable(reply->errorString()));
         }
     }
 

@@ -36,6 +36,7 @@
 #include <QDebug>
 
 #include "networkmanager.h"
+#include "qmlutils.h"
 
 NineGagRequest::NineGagRequest(NetworkManager *networkManager, const QString &section, QObject *parent) :
     GagRequest(networkManager, section, parent)
@@ -51,7 +52,9 @@ QNetworkReply *NineGagRequest::createRequest(const QString &section, const QStri
         requestUrl.setQuery(q.query());
     }
 
-    return networkManager()->createGetRequest(requestUrl, NetworkManager::JSON);
+    qDebug() << "getting url: " << requestUrl;
+
+    return networkManager()->createGetRequest(requestUrl, NetworkManager::HTML);
 }
 
 static QWebElementCollection getEntryItemsFromHtml(const QString &html);
@@ -92,8 +95,10 @@ static QList<GagObject> parseGAG(const QWebElementCollection &entryItems)
         gag.setVotesCount(element.attribute("data-entry-votes").toInt());
         gag.setCommentsCount(element.attribute("data-entry-comments").toInt());
         gag.setTitle(element.findFirst("a").toPlainText().trimmed());
+        gag.setIsPartialImage(false);
 
         const QWebElement postContainer = element.findFirst("div.post-container");
+
         if (!postContainer.findFirst("div.nsfw-post").isNull()) {
             gag.setIsNSFW(true);
         } else if (!postContainer.findFirst("span.play").isNull()) {
@@ -102,11 +107,20 @@ static QList<GagObject> parseGAG(const QWebElementCollection &entryItems)
                 gag.setImageUrl(postContainer.findFirst("img.youtube-thumb").attribute("src"));
             } else {
                 gag.setIsGIF(true);
-                //gag.setImageUrl(postContainer.findFirst("img.badge-item-img").attribute("src"));
                 gag.setImageUrl(postContainer.findFirst("div.badge-animated-container-animated").attribute("data-image"));
                 gag.setGifImageUrl(postContainer.findFirst("div.badge-animated-container-animated").attribute("data-image"));
             }
-        } else {
+        } else if(!element.findFirst("div.post-container.with-button").isNull()) {
+            //not full pic, we'll need to go deeper for the full lenght image
+            const QString regularImgUrl = postContainer.findFirst("img.badge-item-img").attribute("src");
+            QString imgUrl = QString("http://d3dsacqprgcsqh.cloudfront.net/photo/%1_700b.jpg").arg(gag.id());
+
+            gag.setFullImageUrl(imgUrl);
+            gag.setImageUrl(regularImgUrl);
+            gag.setIsPartialImage(true);
+        }
+
+        else {
             gag.setImageUrl(postContainer.findFirst("img.badge-item-img").attribute("src"));
         }
 
