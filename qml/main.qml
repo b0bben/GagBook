@@ -35,7 +35,12 @@ ApplicationWindow {
 
     //showStatusBar: inPortrait
     initialPage: MainPage { id: mainPage }
-    cover: CoverPage{}
+    cover: CoverBackground {
+        CoverPlaceholder {
+            text: "GagBook"
+            icon.source: "../gagbook.png"
+        }
+    }
 
     GagBookManager {
         id: gagbookManager
